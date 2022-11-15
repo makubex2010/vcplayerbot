@@ -23,29 +23,29 @@ async def promote(client, message):
                 return await send_message(
                     client,
                     message.from_user.id,
-                    "__Please provide chats ids as second argument separated by comama.__",
+                    "__請提供聊天 ID 作為以逗號分隔的第二個參數。__",
                 )
             promotional_data = config.get("PROMOTIONAL_DATA")
             if not promotional_data:
                 return await send_message(
                     client,
                     message.from_user.id,
-                    "__Please add the promotional message in database as **PROMOTIONAL_MSG**.__",
+                    "__請在數據庫中添加促銷信息作為 **PROMOTIONAL_MSG**。__",
                 )
             if not is_message_confirmed:
                 await send_message(
                     client,
                     message.from_user.id,
-                    f"__Confirm the below message to **{len(chat_ids)} users** .__",
+                    f"__確認以下訊息至**{len(chat_ids)} users** .__",
                 )
                 chat_ids = config.get("SUDO_USER")
             else:
                 await send_message(
                     client,
                     message.from_user.id,
-                    f"__Started to send message to **{len(chat_ids)} users** .__",
+                    f"__開始發送信息給**{len(chat_ids)} users** .__",
                 )
-            logInfo(f"Starting to send message to {len(chat_ids)} users.")
+            logInfo(f"開始發送信息至 {len(chat_ids)} 用戶.")
             promotional_msg = promotional_data.get("message").replace("\\n", "\n")
             if promotional_data.get("button_text") is not None:
                 keyboard = InlineKeyboardMarkup(
@@ -62,7 +62,7 @@ async def promote(client, message):
                 keyboard = None
             for count, chat in enumerate(chat_ids):
                 logInfo(
-                    f"{count} → Sending to chat: {chat}, Left: {len(chat_ids)-count-1}"
+                    f"{count} → 發送到聊天: {chat}, 剩下: {len(chat_ids)-count-1}"
                 )
                 if promotional_data.get("image"):
                     await send_photo(
@@ -81,8 +81,8 @@ async def promote(client, message):
             await send_message(
                 client,
                 message.from_user.id,
-                f"__Sending promotional message ended **{len(chat_ids)} users** .__",
+                f"__發送促銷信息已結束 **{len(chat_ids)} users** .__",
             )
     except Exception as ex:
-        await send_message(client, message.chat.id, f"__Error while promoting : {ex}__")
-        logException(f"Error in promote: {ex}", True)
+        await send_message(client, message.chat.id, f"__推廣時出錯 : {ex}__")
+        logException(f"推廣錯誤: {ex}", True)
