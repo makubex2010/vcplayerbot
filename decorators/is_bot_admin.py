@@ -50,13 +50,13 @@ def is_bot_admin(func: Callable) -> Callable:
                     )
                 if missing_permissions:
                     missing_permissions = "\n".join(missing_permissions)
-                    msg = f"__Please add the bot **{config.get('BOT_USERNAME')}** as an admin or at least provide the below mandatory permissions to it__.\n__Wait for at least 10 sec after granting the permissions.__\n\n`{missing_permissions}`"
+                    msg = f"__請添加機器人 **{config.get('BOT_USERNAME')}** 作為管理員或至少向它提供以下權限__。\n__授予權限後等待至少 10 秒。__\n\n`{missing_permissions}`"
                     return await client.send_message(
                         message.chat.id, f"{msg}", disable_web_page_preview=True
                     )
 
             return await func(client, incomingPayload, current_client)
         except Exception as ex:
-            logException(f"Error in is_bot_admin: {ex}")
+            logException(f"is_bot_admin 出錯: {ex}")
 
     return decorator
