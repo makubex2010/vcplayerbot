@@ -28,13 +28,13 @@ async def play(client: Client, message, current_client):
         # check if song url or name is provided or not
         parsed_command = current_client.get("parsed_command")
         logInfo(
-            f"Playing command in chat : {current_chat.id} , requested_by: {current_client['requested_by']} , command: {parsed_command}"
+            f"在聊天中播放命令 : {current_chat.id} , requested_by: {current_client['requested_by']} , command: {parsed_command}"
         )
         if not parsed_command or helperClient.isEmpty(parsed_command["song_name"]):
             await send_message(
                 client,
                 current_chat.id,
-                f"__Please provide a media url or name.\nFor instance → **/play summer of 69**__",
+                f"__請提供媒體網址或名稱。\n例如 → **/play 69 歲的夏天**__",
             )
             return
 
@@ -47,7 +47,7 @@ async def play(client: Client, message, current_client):
         sent_msg = await send_message(
             client,
             current_chat.id,
-            f"__👀 Fetching {'video' if parsed_command['is_video'] is True else 'audio'} details... __",
+            f"__👀 抓取 {'video' if parsed_command['is_video'] is True else 'audio'} 細節... __",
         )
         if parsed_command["is_youtube"] is True:
             songDetails = await VideoSearch(
@@ -61,13 +61,13 @@ async def play(client: Client, message, current_client):
                 return await send_message(
                     client,
                     current_chat.id,
-                    f"✖️ __Please provide a direct streamable url.__",
+                    f"✖️ __請提供一個直接的串流媒體網址。__",
                 )
             songDetails = [
                 {
                     "id": uuid.uuid4(),
                     "thumbnails": None,
-                    "title": "Streaming URL",
+                    "title": "串流媒體網址",
                     "long_desc": "A SkTechHub Product",
                     "channel": "SkTechHub",
                     "duration": None,
@@ -85,7 +85,7 @@ async def play(client: Client, message, current_client):
             if song_info["duration"] and song_info["duration"] > int(max_duration):
                 await edit_message(
                     sent_msg,
-                    f"__😢 The specified song is too long, Please use a song with less than {max_duration} sec duration.__",
+                    f"__😢 指定的歌曲太長，請使用長度小於 {max_duration} 秒的歌曲。__",
                 )
                 return
             song_info["is_repeat"] = parsed_command["is_repeat"]
@@ -96,7 +96,7 @@ async def play(client: Client, message, current_client):
             await gc_instance.add_to_queue(song_info, sent_msg)
         else:
             await edit_message(
-                sent_msg, f"__😢 Unable to find the required song, Please try again.__"
+                sent_msg, f"__😢 無法找到所需的歌曲，請重試.__"
             )
 
     except Exception as ex:
