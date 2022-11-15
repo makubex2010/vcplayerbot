@@ -66,19 +66,19 @@ class GroupCallInstance(object):
         @self.pytgcalls.on_playout_ended
         async def media_ended(gc, source, media_type) -> None:
             try:
-                self.logInfo(f"Playout ended, skipping to next song")
+                self.logInfo(f"播放結束，跳到下一首歌曲")
                 await self.skip_playback(user_requested=False)
             except Exception as ex:
-                self.logException(f"Error in on_stream_end: {ex}", True)
+                self.logException(f"on_stream_end 錯誤: {ex}", True)
 
     async def set_pause_playback(self, pause=True):
         resp_msg = None
         try:
             await self.pytgcalls.set_pause(pause)
-            resp_msg = f"✅ __Successfully {'Paused' if pause is True else 'Resumed'} the playback.__"
+            resp_msg = f"✅ __成功{'Paused' if pause is True else 'Resumed'}回放。__"
         except Exception as ex:
-            self.logException(f"Error in set_pause_playback : {ex}")
-            resp_msg = f"✖️ __Error while {'Pausing' if pause is True else 'Resuming'} : {ex}__"
+            self.logException(f"set_pause_playback 錯誤 : {ex}")
+            resp_msg = f"✖️ __出錯時{'Pausing' if pause is True else 'Resuming'} : {ex}__"
         finally:
             if resp_msg:
                 await send_message(self.bot_client, self.chat_id, f"{resp_msg}")
@@ -88,7 +88,7 @@ class GroupCallInstance(object):
             if fetching_media_msg is not None:
                 await delete_message(fetching_media_msg)
             m = await send_message(
-                self.bot_client, self.chat_id, f"__🖼 Generating Thumbnail__"
+                self.bot_client, self.chat_id, f"__🖼 生成縮略圖__"
             )
             cover_file_name = None
             if (
@@ -109,15 +109,15 @@ class GroupCallInstance(object):
             if config.get("PLAYBACK_FOOTER"):
                 footer = f"{config.get('PLAYBACK_FOOTER')}".replace("\\n", "\n")
             footer_val = (
-                footer if footer else "For any issues contact @voicechatsupport"
+                footer if footer else "如有任何問題，請聯繫@Kevin_RX"
             )
             if songInfo["requested_by"].get("group_username"):
-                footer_val = f"[Click Here](https://t.me/{songInfo['requested_by']['group_username']}?voicechat) to join voice chat and listen/video media.\n{footer_val}"
+                footer_val = f"[點擊這裡](https://t.me/{songInfo['requested_by']['group_username']}?voicechat) 加入語音聊天和收聽/視頻媒體。\n{footer_val}"
             req_by = f"[{songInfo['requested_by']['title']}](tg://user?id={songInfo['requested_by']['chat_id']})"
             await delete_message(m)
             if cover_file_name is not None and os.path.exists(cover_file_name):
                 logInfo(
-                    f"Sending cover mesage in chat : {self.chat_id} : {cover_file_name}"
+                    f"在聊天中發送封面 : {self.chat_id} : {cover_file_name}"
                 )
                 caption = f"**{'📹' if songInfo['is_video'] is True else '🎧'} Name:** `{(songInfo['title'].strip())[:20]}`\n**⏱ Duration:** `{songInfo['duration']}` | **📺 Res:** `{songInfo['resolution']}`\n**💡 Requester:** {req_by}\n\n{footer_val}"
                 await send_photo(
@@ -133,11 +133,11 @@ class GroupCallInstance(object):
             else:
                 await send_message(
                     self.chat_id,
-                    f"**✅ Playing Now **\n\n**🎧 Name:** `{(songInfo['title'].strip())[:20]}`\n**⏱ Duration:** `{songInfo['duration']}`\n**💡 Requester:** {req_by}\n\n{footer_val}",
+                    f"**✅ 現在播放 **\n\n**🎧 歌名:** `{(songInfo['title'].strip())[:20]}`\n**⏱ 歌曲時間:** `{songInfo['duration']}`\n**💡 請求者:** {req_by}\n\n{footer_val}",
                 )
                 return
         except Exception as ex:
-            self.logException(f"Error in thumbnail_processing : {ex}")
+            self.logException(f"thumbnail_processing 出錯 : {ex}")
             raise Exception(ex)
 
     async def check_if_user_bot_in_group(self):
@@ -147,7 +147,7 @@ class GroupCallInstance(object):
             )
             return member is not None
         except Exception as ex:
-            self.logException(f"Error in checkIfUserBotIsInGroup : {ex}")
+            self.logException(f"checkIfUserBotIsInGroup 出錯 : {ex}")
             raise Exception(ex)
 
     async def try_to_add_user_app_in_group(self):
@@ -158,21 +158,21 @@ class GroupCallInstance(object):
         except UserAlreadyParticipant:
             return True
         except Exception as ex:
-            self.logException(f"Error in try_to_add_user_app_in_group : {ex}")
+            self.logException(f"try_to_add_user_app_in_group 出錯 : {ex}")
             raise Exception(ex)
 
     async def start_playback(self, songInfo, fetching_media_msg=None):
         isError, resp_msg = None, None
         try:
-            self.logInfo(f"Starting the playback, SongInfo  → {songInfo}")
+            self.logInfo(f"開始播放，歌曲 → {songInfo}")
             try:
                 isMember = await self.check_if_user_bot_in_group()
                 if not isMember:
                     await self.try_to_add_user_app_in_group()
             except Exception as ex:
-                self.logException(f"Error while starting the playback: {ex}")
+                self.logException(f"開始播放時出錯： {ex}")
                 tag = f"[{self.user_app_info['username']}](tg://user?id={self.user_app_info['id']})"
-                resp_msg = f"✖️__Make sure user app {tag} is added as admin in this group. → {ex}__"
+                resp_msg = f"✖️__確保用戶 {tag} 被添加為該組的管理員。 → {ex}__"
                 return
 
             try:
@@ -201,7 +201,7 @@ class GroupCallInstance(object):
                         with_audio=True,
                         enable_experimental_lip_sync=songInfo["lip_sync"],
                     )
-                self.logInfo(f"Started playback")
+                self.logInfo(f"開始播放")
                 self.active = True
             except GroupCallNotFoundError as ex:
                 msg, kbd = getMessage(None, "start-voice-chat")
@@ -220,11 +220,11 @@ class GroupCallInstance(object):
                 )
                 await self.user_app_client.send(title_change)
             except Exception as ex:
-                logWarning(f"Unable to change group call title ")
+                logWarning(f"無法更改群組通話標題 ")
 
         except Exception as ex:
-            self.logException(f"Error while starting the playback: {ex}", True)
-            resp_msg = f"__Error while starting the playback : {ex}__"
+            self.logException(f"開始播放時出錯: {ex}", True)
+            resp_msg = f"__開始播放時出錯 : {ex}__"
             isError = True
         finally:
             if resp_msg:
@@ -235,11 +235,11 @@ class GroupCallInstance(object):
     async def add_to_queue(self, songInfo, fetching_media_msg=None):
         resp_msg = None
         try:
-            self.logInfo(f"Adding song to the queue.")
+            self.logInfo(f"將歌曲添加到清單中。")
             max_queue_size = self.client_doc.get("extras").get("max_queue_size")
             if queues.size(self.chat_id) >= max_queue_size:
                 resp_msg = (
-                    f"✖️__Currently at most {max_queue_size} media can be added in queue. Please try again after some time.__",
+                    f"✖️__目前最多 {max_queue_size} 媒體可以添加到清單中。 請稍後重試。__",
                 )
             await queues.put(
                 self.chat_id, songInfo=songInfo, requested_by=songInfo["requested_by"]
@@ -255,8 +255,8 @@ class GroupCallInstance(object):
                 resp_msg = f"__✅ Added to queue.__\n\n**Name:** `{(songInfo['title'].strip())[:20]}`\n**Requester:** {req_by}\n**Media in queue:** `{queues.size(self.chat_id)}`"
 
         except Exception as ex:
-            self.logException(f"Error in add_to_queue: {ex}")
-            resp_msg = f"✖️ __Error while adding song in the queue : {ex}.__"
+            self.logException(f"add_to_queue 錯誤： {ex}")
+            resp_msg = f"✖️ __在清單中添加歌曲時出錯 : {ex}.__"
         finally:
             if resp_msg:
                 await send_message(self.bot_client, self.chat_id, resp_msg)
@@ -265,13 +265,13 @@ class GroupCallInstance(object):
         resp_msg = None
         try:
             self.logInfo(
-                f"Skipping the playback : user_requested : {user_requested}, size of queue : {queues.size(self.chat_id)} "
+                f"跳過播放 : user_requested : {user_requested}, 隊列大小 : {queues.size(self.chat_id)} "
             )
             queues.task_done(self.chat_id)
             if queues.is_empty(self.chat_id) is True:
                 if user_requested is False:
                     return await self.stop_playback()
-                resp_msg = f"🛑 __There is no media waiting in queue, If you want to stop send /stop.__"
+                resp_msg = f"🛑 __隊列中沒有媒體等待，如果你想停止發送 /stop.__"
             else:
                 new_media = queues.get(self.chat_id)
                 await self.start_playback(new_media["songInfo"])
@@ -287,35 +287,35 @@ class GroupCallInstance(object):
     ):
         resp_msg = None
         try:
-            self.logInfo(f"Stopping the playback : user_requested : {user_requested} ")
+            self.logInfo(f"停止播放 : user_requested : {user_requested} ")
             try:
                 queues.clear(self.chat_id)
             except QueueEmpty as qe:
-                self.logWarn(f"Can be ignored : QueueEmpty::stop :{qe}")
+                self.logWarn(f"可以忽略 : 隊列空::stop :{qe}")
             except Exception as ex:
-                self.logWarn(f"Can be ignored : QueueClear Error :{ex}")
+                self.logWarn(f"可以忽略 : 隊列清除 Error :{ex}")
 
             try:
                 await self.pytgcalls.stop()
             except Exception as ex:
-                self.logWarn(f"Can be ignored : pytgcalls.stop :{ex}")
+                self.logWarn(f"可以忽略 : pytgcalls.stop :{ex}")
 
             try:
                 await self.pytgcalls.leave_current_group_call()
             except Exception as ex:
-                self.logWarn(f"Can be ignored : leave_current_group_call :{ex}")
+                self.logWarn(f"可以忽略 : leave_current_group_call :{ex}")
 
             if send_reason_msg is True:
-                resp_msg = f"**Playback ended `[If you were in middle of a song and you are getting this message then this has happended due to a deployement. You can play again after some time.]`**\n\n__Thank you for trying and do give your feedback/suggestion @sktechhub_chat.__"
+                resp_msg = f"**播放結束 `[如果您正在播放歌曲並且收到此消息，那麼這是由於部署而發生的。 你可以過一段時間再玩。]`**\n\n__感謝您嘗試並提供您的反饋/建議@sktechhub_chat。__"
             else:
-                resp_msg = f"__Playback ended, do give your feedback/suggestion @voicechatsupport.__"
+                resp_msg = f"__播放結束，請提供您的反饋/建議@voicechatsupport。__"
 
         except BotMethodInvalid as bi:
-            self.logWarn(f"Expected error while stopping the playback : {bi}")
-            resp_msg = f"✖️ __Error while stopping : {bi}__"
+            self.logWarn(f"停止播放時出現預期錯誤 : {bi}")
+            resp_msg = f"✖️ __停止時出錯 : {bi}__"
         except Exception as ex:
-            self.logException(f"Error while stopping the playback: {ex}")
-            resp_msg = f"✖️ __Error while stopping : {ex}__"
+            self.logException(f"停止播放時出錯: {ex}")
+            resp_msg = f"✖️ __停止時出錯 : {ex}__"
         finally:
             self.active = False
             if (
@@ -338,11 +338,11 @@ class MusicPlayer(metaclass=Singleton):
                 if gc_instance.active is True:
                     new_gc[chat_id] = gc_instance
             logInfo(
-                f"cleanTheGroupCallDict : New {len(new_gc)} , old : {len(self.group_calls)}"
+                f"清理 GroupCall Dict : New {len(new_gc)} , old : {len(self.group_calls)}"
             )
             self.group_calls = new_gc
         except Exception as ex:
-            logException(f"Error in cleanTheGroupCallDict {ex}", True)
+            logException(f"cleanTheGroupCallDict 中的錯誤 {ex}", True)
 
     def _getActiveGroupCalls(self):
         return len(self.group_calls)
@@ -350,37 +350,37 @@ class MusicPlayer(metaclass=Singleton):
     async def getGroupCallInstance(self, chat_id):
         try:
             logInfo(
-                f"Call for getting group call instance : {chat_id} {len(self.group_calls)}"
+                f"調用獲取組呼實例 : {chat_id} {len(self.group_calls)}"
             )
             self.cleanTheGroupCallDict()
             return (
                 self.group_calls.get(chat_id),
-                f"🤭 __Please play a media first before performing this action.__",
+                f"🤭 __請先播放媒體，然後再執行此操作。__",
             )
         except Exception as ex:
-            logException(f"Error in getGroupCallInstance {ex}")
+            logException(f"getGroupCallInstance 出錯 {ex}")
             return (
                 None,
-                f"__❌ Unexpected Error, be assured our best minds have been notified and they are working on it.__",
+                f"__❌意外錯誤，請放心，我們最優秀的人才已收到通知，他們正在努力解決。__",
             )
 
     async def createGroupCallInstance(self, chat_id, current_client, bot_client):
         try:
             logInfo(
-                f"Call for Creating new group call instance : {chat_id} {len(self.group_calls)}"
+                f"呼叫創建新的群組呼叫實例 : {chat_id} {len(self.group_calls)}"
             )
             gc_instance, err_msg = await self.getGroupCallInstance(chat_id)
             if gc_instance is not None:
-                logInfo(f"GroupCall Instance already exists.")
+                logInfo(f"GroupCall 實例已經存在。")
                 return self.group_calls.get(chat_id), ""
             else:
                 # check if it can be created
                 if self._getActiveGroupCalls() >= config.get("SIMULTANEOUS_CALLS"):
                     return (
                         None,
-                        f"__❌ Sorry but currently the service is being used in `{self._getActiveGroupCalls()}` groups/channels and currently due to lack of resource we support at max `{config.get('SIMULTANEOUS_CALLS')}` simultaneous playbacks.__\n\n__Please try again after some time.__",
+                        f"__❌ 抱歉，目前該服務正在使用中 `{self._getActiveGroupCalls()}` 群組/頻道，目前由於缺乏資源，我們最多支持 `{config.get('SIMULTANEOUS_CALLS')}` 同時播放。__\n\n__請稍後重試。__",
                     )
-                logInfo(f"Creating new group call instance : {chat_id}")
+                logInfo(f"新建群組通話實例 : {chat_id}")
                 user_app, user_app_info = None, None
                 try:
                     userBotDoc = current_client["userBot"]
@@ -403,10 +403,10 @@ class MusicPlayer(metaclass=Singleton):
                         "username": username if username else "User",
                     }
                 except Exception as ex:
-                    logException(f"Error in while starting client: {ex}")
+                    logException(f"啟動客戶端時出錯: {ex}")
                     return (
                         None,
-                        f"__❌ Unable to start the user bot : {ex}\nAsk admin to authorize again.__",
+                        f"__❌ 無法啟動用戶機器人 : {ex}\n請管理員再次授權。__",
                     )
 
                 gc = GroupCallInstance(
@@ -416,10 +416,10 @@ class MusicPlayer(metaclass=Singleton):
                 return gc, None
 
         except Exception as ex:
-            logException(f"Error in createGroupCallInstance: {ex}", True)
+            logException(f"createGroupCallInstance 出錯: {ex}", True)
             return (
                 None,
-                "__❌ Unexpected Error, be assured our best minds have been notified and they are working on it.__",
+                "__❌ 意外錯誤，請放心，我們最優秀的人才已收到通知，他們正在努力解決.__",
             )
 
     async def shutdown(self):
@@ -429,9 +429,9 @@ class MusicPlayer(metaclass=Singleton):
                     if gc is not None and gc.active is True:
                         await gc.stopPlayBack(False, True)
                 except Exception as ex:
-                    logException(f"Error while shutting down {chat_id},  {ex}", True)
+                    logException(f"關機時出錯 {chat_id},  {ex}", True)
 
         except Exception as ex:
             logException(
-                f"Error while shutting down all instances of music player {ex}", True
+                f"關閉音樂播放器的所有實例時出錯 {ex}", True
             )
