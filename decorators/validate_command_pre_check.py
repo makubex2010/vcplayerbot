@@ -37,39 +37,39 @@ def validate_command_pre_check(func: Callable) -> Callable:
                 reason = (
                     current_client.get("error")
                     if current_client.get("error")
-                    else "Banned/Not allowed by admin."
+                    else "管理員禁止/不允許。"
                 )
             elif not current_client.get("userBot") or not current_client.get(
                 "userBot"
             ).get("sessionId"):
-                reason = "You have not authorized the bot yet, send /start and ask **Group Admin** to tap on authorize button."
+                reason = "您還沒有給機器人權限，請發送 /start 點擊授權按鈕。"
             elif (
                 isPlayCommand is True
                 and parsed_command["is_video"] is True
                 and current_client.get("extras").get("allow_video") is False
             ):
-                reason = f"Video playback is disabled by admin."
+                reason = f"視頻播放已被管理員禁用。"
             elif (
                 isPlayCommand is True
                 and parsed_command["is_video"] is False
                 and current_client.get("extras").get("allow_audio") is False
             ):
-                reason = f"Audio playback is disabled by admin."
+                reason = f"管理員禁用了音頻播放。"
             elif (
                 isPlayCommand is True
                 and parsed_command["is_youtube"] is False
                 and current_client.get("extras").get("allow_others") is False
             ):
-                reason = f"Only youtube playbacks are allowed in your account."
+                reason = f"您的帳戶中只允許播放 youtube。"
             elif current_client.get("extras").get("min_members", 0) > 0:
                 num_members = await get_chat_member_count(client, current_chat.id)
                 current_client["num_members"] = num_members
                 required = current_client.get("extras").get("min_members", 0)
                 if num_members and num_members < required:
-                    reason = f"At least **{required}** members are required in the group/channel."
+                    reason = f"群組/頻道至少需要 **{required}** 成員。"
 
             if reason:
-                msg = f"😕__Sorry to break this to you, but you cannot access the bot due to below reason:__\n\n**__{reason}__**\n\n__Contact [Support Group]({config.get('SUPPORT_GROUP')}) for any queries.__"
+                msg = f"😕很抱歉打擾你，但由於以下原因你無法訪問機器人：__\n\n**__{reason}__**\n\n__聯繫[群組]（{config.get（'SUPPORT_GROUP' )}) 對於任何查詢"
                 return await client.send_message(
                     message.chat.id, f"{msg}", disable_web_page_preview=True
                 )
