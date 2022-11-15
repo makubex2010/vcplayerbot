@@ -21,12 +21,12 @@ def hasRequiredPermission(user):
                 not_present.append(_)
         return len(not_present) == 0
     except Exception as ex:
-        logException(f"Error in hasRequiredPermission : {ex}")
+        logException(f"hasRequiredPermission 錯誤 : {ex}")
 
 
 async def validate_session_string(api_id, api_hash, session_string, getUser=False):
     try:
-        logInfo(f"Starting to validate user: {api_id}, {api_hash}")
+        logInfo(f"開始驗證用戶: {api_id}, {api_hash}")
         user_app = Client(
             session_string,
             api_id=int(api_id),
@@ -34,14 +34,14 @@ async def validate_session_string(api_id, api_hash, session_string, getUser=Fals
         )
         await user_app.start()
         me = await user_app.get_me()
-        logInfo(f"validated session string: {me.id}")
+        logInfo(f"驗證會話字符串: {me.id}")
         if getUser is False:
             await user_app.stop()
             return True, "", None, me.id, me.username
         else:
             return True, "", user_app, me.id, me.username
     except Exception as ex:
-        logException(f"Error in validate_session_string : {ex}")
+        logException(f"validate_session_string 出錯 : {ex}")
         return False, str(ex), None, "", ""
 
 
@@ -69,7 +69,7 @@ async def get_chat_member_count(client: Client, chat_id):
         return chat.members_count
         # await client.get_chat_members_count(chat_id)
     except Exception as ex:
-        logException(f"Error in get_chat_member_count : {ex}")
+        logException(f"get_chat_member_count 出錯 : {ex}")
 
 
 @AsyncTTL(time_to_live=60, maxsize=1024)
@@ -77,7 +77,7 @@ async def get_chat_member_list(client: Client, chat_id):
     try:
         await client.get_chat_members(client, chat_id)
     except Exception as ex:
-        logException(f"Error in get_chat_member_list : {ex}")
+        logException(f"get_chat_member_list 出錯 : {ex}")
 
 
 @AsyncTTL(time_to_live=30, maxsize=1024)
@@ -101,7 +101,7 @@ async def getAlladmins(client: Client, chat_id):
         ]
         return admins
     except Exception as ex:
-        logException(f"Error while fetching admins : {ex}")
+        logException(f"獲取管理員時出錯 : {ex}")
         return []
 
 
@@ -113,7 +113,7 @@ async def delayDelete(message, delay=1):
             await asyncio.sleep(delay)
             await message.delete()
     except Exception as ex:
-        logException(f"Error in delayDelete : {ex}")
+        logException(f"延遲刪除錯誤 : {ex}")
 
 
 async def delete_message(message: Message):
@@ -121,7 +121,7 @@ async def delete_message(message: Message):
         if message is not None and isinstance(message, Message):
             await message.delete()
     except Exception as ex:
-        logException(f"Error in delete_message : {ex}")
+        logException(f"delete_message 出錯 : {ex}")
 
 
 async def send_message(client: Client, chat_id, message, reply_markup=None):
@@ -139,7 +139,7 @@ async def send_message(client: Client, chat_id, message, reply_markup=None):
             disable_web_page_preview=True,
         )
     except Exception as ex:
-        logException(f"Error in send_message : {ex}")
+        logException(f"send_message 出錯 : {ex}")
 
 
 async def send_photo(client: Client, chat_id, photo, caption, reply_markup=None):
@@ -150,14 +150,14 @@ async def send_photo(client: Client, chat_id, photo, caption, reply_markup=None)
             )
         return await client.send_photo(chat_id, photo=photo, caption=caption)
     except Exception as ex:
-        logException(f"Error in send_photo : {ex}")
+        logException(f"發送照片時出錯 : {ex}")
 
 
 async def edit_message(sent_message: Message, message):
     try:
         return await sent_message.edit(message, disable_web_page_preview=True)
     except Exception as ex:
-        logException(f"Error in edit_message : {ex}")
+        logException(f"edit_message 出錯 : {ex}")
 
 
 def parseIncomingCommand(command, max_video_res=None, max_audio_res=None):
@@ -205,4 +205,4 @@ def parseIncomingCommand(command, max_video_res=None, max_audio_res=None):
             "lip_sync": lip_sync is True,
         }
     except Exception as ex:
-        logException(f"Error in parseIncomingCommand : {ex}")
+        logException(f"解析指令錯誤 : {ex}")
