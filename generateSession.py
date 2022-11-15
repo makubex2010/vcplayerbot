@@ -1,17 +1,17 @@
 """
-A small script to generate pyrogram session string
+生成熱圖會話字符串的小腳本
 """
 from pyrogram import Client
 
 try:
     print(
-        "Make sure you have API Client ID and Hash , If not goto my.telegram.org and generate it.\n\n"
+        "確保您有 API ID 和HASH，如果沒有，請轉到 my.telegram.org 並生成它。\n\n"
     )
     API_ID = input("Enter Your API ID -  ")
     API_HASH = input("Enter Your API HASH -  ")
 
     print(
-        "\n\nNow it will ask you to enter your phone number(in international format) and then follow the steps"
+        "\n\n現在它會要求您輸入您的電話號碼（國際格式），然後按照步驟操作"
     )
 
     client = Client(":memory:", api_id=API_ID, api_hash=API_HASH)
@@ -19,11 +19,11 @@ try:
     with client:
         session = client.export_session_string()
         print(
-            "\nDone your session string will be saved in your saved messages! Don't Share it with anyone else."
+            "\n完成您的會話字符串將保存在您保存的消息中！ 不要與其他任何人分享。"
         )
         client.send_message(
             "me",
-            f"Your session String :\n\n`{session}`\n\nBy @vcplayerbot | [SkTechHub Product](https://t.me/sktechhub)",
+            f"您的會話字符串：\n\n`{session}`\n\n@vcplayerbot | [SkTechHub 產品](https://t.me/sktechhub)",
         )
 except Exception as ex:
-    print(f"\nSome error occurred : {ex}")
+    print(f"\n發生了一些錯誤： {ex}")
